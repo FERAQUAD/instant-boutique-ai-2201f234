@@ -14,6 +14,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiGenerateBannerRouteImport } from './routes/api/generate-banner'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProductsRouteImport } from './routes/_authenticated/products'
 import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
@@ -22,6 +23,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as SSlugIndexRouteImport } from './routes/s.$slug.index'
 import { Route as SSlugCheckoutRouteImport } from './routes/s.$slug.checkout'
 import { Route as SSlugProductIdRouteImport } from './routes/s.$slug.product.$id'
+import { Route as SSlugOrderIdRouteImport } from './routes/s.$slug.order.$id'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -45,6 +47,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiGenerateBannerRoute = ApiGenerateBannerRouteImport.update({
+  id: '/api/generate-banner',
+  path: '/api/generate-banner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
@@ -87,6 +94,11 @@ const SSlugProductIdRoute = SSlugProductIdRouteImport.update({
   path: '/s/$slug/product/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SSlugOrderIdRoute = SSlugOrderIdRouteImport.update({
+  id: '/s/$slug/order/$id',
+  path: '/s/$slug/order/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -98,8 +110,10 @@ export interface FileRoutesByFullPath {
   '/orders': typeof AuthenticatedOrdersRoute
   '/products': typeof AuthenticatedProductsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/api/generate-banner': typeof ApiGenerateBannerRoute
   '/s/$slug/checkout': typeof SSlugCheckoutRoute
   '/s/$slug/': typeof SSlugIndexRoute
+  '/s/$slug/order/$id': typeof SSlugOrderIdRoute
   '/s/$slug/product/$id': typeof SSlugProductIdRoute
 }
 export interface FileRoutesByTo {
@@ -112,8 +126,10 @@ export interface FileRoutesByTo {
   '/orders': typeof AuthenticatedOrdersRoute
   '/products': typeof AuthenticatedProductsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/api/generate-banner': typeof ApiGenerateBannerRoute
   '/s/$slug/checkout': typeof SSlugCheckoutRoute
   '/s/$slug': typeof SSlugIndexRoute
+  '/s/$slug/order/$id': typeof SSlugOrderIdRoute
   '/s/$slug/product/$id': typeof SSlugProductIdRoute
 }
 export interface FileRoutesById {
@@ -128,8 +144,10 @@ export interface FileRoutesById {
   '/_authenticated/orders': typeof AuthenticatedOrdersRoute
   '/_authenticated/products': typeof AuthenticatedProductsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/api/generate-banner': typeof ApiGenerateBannerRoute
   '/s/$slug/checkout': typeof SSlugCheckoutRoute
   '/s/$slug/': typeof SSlugIndexRoute
+  '/s/$slug/order/$id': typeof SSlugOrderIdRoute
   '/s/$slug/product/$id': typeof SSlugProductIdRoute
 }
 export interface FileRouteTypes {
@@ -144,8 +162,10 @@ export interface FileRouteTypes {
     | '/orders'
     | '/products'
     | '/settings'
+    | '/api/generate-banner'
     | '/s/$slug/checkout'
     | '/s/$slug/'
+    | '/s/$slug/order/$id'
     | '/s/$slug/product/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -158,8 +178,10 @@ export interface FileRouteTypes {
     | '/orders'
     | '/products'
     | '/settings'
+    | '/api/generate-banner'
     | '/s/$slug/checkout'
     | '/s/$slug'
+    | '/s/$slug/order/$id'
     | '/s/$slug/product/$id'
   id:
     | '__root__'
@@ -173,8 +195,10 @@ export interface FileRouteTypes {
     | '/_authenticated/orders'
     | '/_authenticated/products'
     | '/_authenticated/settings'
+    | '/api/generate-banner'
     | '/s/$slug/checkout'
     | '/s/$slug/'
+    | '/s/$slug/order/$id'
     | '/s/$slug/product/$id'
   fileRoutesById: FileRoutesById
 }
@@ -184,8 +208,10 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
+  ApiGenerateBannerRoute: typeof ApiGenerateBannerRoute
   SSlugCheckoutRoute: typeof SSlugCheckoutRoute
   SSlugIndexRoute: typeof SSlugIndexRoute
+  SSlugOrderIdRoute: typeof SSlugOrderIdRoute
   SSlugProductIdRoute: typeof SSlugProductIdRoute
 }
 
@@ -224,6 +250,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/generate-banner': {
+      id: '/api/generate-banner'
+      path: '/api/generate-banner'
+      fullPath: '/api/generate-banner'
+      preLoaderRoute: typeof ApiGenerateBannerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/settings': {
@@ -282,6 +315,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SSlugProductIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/s/$slug/order/$id': {
+      id: '/s/$slug/order/$id'
+      path: '/s/$slug/order/$id'
+      fullPath: '/s/$slug/order/$id'
+      preLoaderRoute: typeof SSlugOrderIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -311,20 +351,12 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
+  ApiGenerateBannerRoute: ApiGenerateBannerRoute,
   SSlugCheckoutRoute: SSlugCheckoutRoute,
   SSlugIndexRoute: SSlugIndexRoute,
+  SSlugOrderIdRoute: SSlugOrderIdRoute,
   SSlugProductIdRoute: SSlugProductIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

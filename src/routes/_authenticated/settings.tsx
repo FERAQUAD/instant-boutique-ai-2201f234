@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Sparkles } from "lucide-react";
 import { getMyStore, updateMyStore } from "@/lib/stores.functions";
 import { DashboardShell } from "@/components/dashboard-shell";
 import { Card } from "@/components/ui/card";
@@ -10,7 +11,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
+
+const BUSINESS_TYPES = [
+  "Fashion & Apparel", "Beauty & Cosmetics", "Electronics & Gadgets",
+  "Food & Groceries", "Home & Furniture", "Health & Wellness",
+  "Jewelry & Accessories", "Baby & Kids", "Sports & Outdoors",
+  "Books & Stationery", "Art & Crafts", "Other",
+];
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Settings — StoreGen" }] }),
@@ -27,6 +37,9 @@ function SettingsPage() {
   const [form, setForm] = useState<any>(null);
   const [uploading, setUploading] = useState<"logo" | "banner" | null>(null);
   const [saving, setSaving] = useState(false);
+  const [aiBusiness, setAiBusiness] = useState<string>("Fashion & Apparel");
+  const [aiVibe, setAiVibe] = useState<string>("");
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     if (storeQ.isSuccess && !storeQ.data) navigate({ to: "/onboarding" });
@@ -72,6 +85,40 @@ function SettingsPage() {
     finally { setSaving(false); }
   }
 
+  async function generateBanner() {
+    if (!form?.id) return;
+    setGenerating(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not signed in");
+      const res = await fetch("/api/generate-banner", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          storeId: form.id,
+          ownerId: user.id,
+          storeName: form.store_name,
+          businessType: aiBusiness,
+          vibe: aiVibe || undefined,
+          primary: form.theme_settings?.primary,
+        }),
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        if (res.status === 429) throw new Error("AI is busy. Please try again in a moment.");
+        if (res.status === 402) throw new Error("AI credits exhausted. Add credits in workspace settings.");
+        throw new Error(txt || "Generation failed");
+      }
+      const json = await res.json();
+      setForm((f: any) => ({ ...f, hero_banner: json.url }));
+      toast.success("Banner generated! Click Save to publish.");
+    } catch (e) {
+      toast.error((e as Error).message, { duration: 8000 });
+    } finally {
+      setGenerating(false);
+    }
+  }
+
   if (!form) return <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">Loading…</div>;
 
   return (
@@ -110,6 +157,42 @@ function SettingsPage() {
               <Input type="color" value={form.theme_settings?.secondary ?? "#0f172a"} onChange={(e) => setForm({ ...form, theme_settings: { ...form.theme_settings, secondary: e.target.value } })} />
             </div>
           </div>
+        </Card>
+
+        <Card className="space-y-4 p-6">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <h3 className="font-display font-bold">AI banner generator</h3>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Let Lovable AI design a hero banner for your storefront based on your business type and style.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label>Business type</Label>
+              <Select value={aiBusiness} onValueChange={setAiBusiness}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {BUSINESS_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Style / vibe (optional)</Label>
+              <Input value={aiVibe} onChange={(e) => setAiVibe(e.target.value)} placeholder="e.g. luxury, minimalist, vibrant…" />
+            </div>
+          </div>
+          {form.hero_banner && (
+            <div>
+              <Label className="text-xs">Current banner preview</Label>
+              <img src={form.hero_banner} className="mt-1 h-32 w-full rounded-md object-cover" alt="banner preview" />
+            </div>
+          )}
+          <Button onClick={generateBanner} disabled={generating} variant="outline" className="w-full">
+            <Sparkles className="mr-2 h-4 w-4" />
+            {generating ? "Generating banner… (10-20s)" : "Generate banner with AI"}
+          </Button>
+          <p className="text-xs text-muted-foreground">After generating, click <strong>Save changes</strong> below to publish to your storefront.</p>
         </Card>
 
         <Card className="space-y-4 p-6">

@@ -90,8 +90,13 @@ function ProductPage() {
                 style={{ background: primary }}
                 disabled={product.inventory_count === 0}
                 onClick={() => {
-                  add(slug, { productId: product.id, name: product.name, price: Number(product.price), image: images[0], quantity: qty });
-                  toast.success("Added to cart");
+                  const r = add(slug, {
+                    productId: product.id, name: product.name, price: Number(product.price),
+                    image: images[0], quantity: qty,
+                    maxQuantity: Number(product.inventory_count) || 0,
+                  });
+                  if (r.ok) toast.success("Added to cart");
+                  else toast.error(r.reason ?? "Couldn't add");
                 }}
               >
                 <ShoppingCart className="mr-2 h-4 w-4" /> Add to cart

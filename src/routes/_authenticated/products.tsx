@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -12,11 +12,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { formatNaira } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/products")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    new: search.new === "1" ? "1" : undefined,
+  }),
   head: () => ({ meta: [{ title: "Products — StoreGen" }] }),
   component: ProductsPage,
 });
@@ -39,8 +43,17 @@ function ProductsPage() {
   const storeQ = useQuery({ queryKey: ["my-store"], queryFn: () => getStore({}) });
   const productsQ = useQuery({ queryKey: ["my-products"], queryFn: () => list({}), enabled: !!storeQ.data });
 
+  const search = Route.useSearch();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
+
+  useEffect(() => {
+    if (search.new === "1") {
+      setEditing(null);
+      setOpen(true);
+      navigate({ to: "/products", search: {}, replace: true });
+    }
+  }, [search.new]);
 
   if (storeQ.isLoading) return <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">Loading…</div>;
   if (storeQ.isSuccess && !storeQ.data) { navigate({ to: "/onboarding" }); return null; }
@@ -153,8 +166,12 @@ function ProductForm({
   const [inventory, setInventory] = useState(String(initial?.inventory_count ?? 0));
   const [category, setCategory] = useState(initial?.category ?? "");
   const [images, setImages] = useState<string[]>(initial?.images ?? []);
+  const [published, setPublished] = useState<boolean>(initial ? initial.is_published : true);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  const invNum = Number(inventory) || 0;
+  const effectivePublished = published && invNum > 0;
 
   async function uploadFiles(files: FileList | null) {
     if (!files?.length) return;
@@ -189,7 +206,7 @@ function ProductForm({
         inventory_count: Number(inventory),
         category: category || null,
         images,
-        is_published: true,
+        is_published: effectivePublished,
       });
     } finally { setSubmitting(false); }
   }
@@ -240,6 +257,17 @@ function ProductForm({
             ))}
           </div>
         )}
+      </div>
+      <div className="flex items-center justify-between rounded-md border border-border p-3">
+        <div>
+          <Label className="text-sm">Publish to storefront</Label>
+          <p className="text-xs text-muted-foreground">
+            {invNum === 0
+              ? "Inventory is 0 — product will stay hidden until you add stock."
+              : "Customers can see and order this product."}
+          </p>
+        </div>
+        <Switch checked={effectivePublished} disabled={invNum === 0} onCheckedChange={setPublished} />
       </div>
       <Button type="submit" className="w-full" disabled={submitting || uploading}>
         {submitting ? "Saving…" : "Save product"}

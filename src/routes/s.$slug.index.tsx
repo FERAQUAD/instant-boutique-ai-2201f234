@@ -15,10 +15,12 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/s/$slug/")({
   loader: async ({ params }) => {
-    const { getPublicStore } = await import("@/lib/stores.functions");
-    const store = await getPublicStore({ data: { slug: params.slug } });
+    const [store, products] = await Promise.all([
+      getPublicStore({ data: { slug: params.slug } }),
+      getPublicProducts({ data: { slug: params.slug } }),
+    ]);
     if (!store) throw notFound();
-    return { store };
+    return { store, products };
   },
   head: ({ loaderData }) => ({
     meta: [
@@ -39,12 +41,13 @@ export const Route = createFileRoute("/s/$slug/")({
 });
 
 function StorePage() {
-  const { store } = Route.useLoaderData();
+  const { store, products: ssrProducts } = Route.useLoaderData();
   const { slug } = Route.useParams();
   const getProducts = useServerFn(getPublicProducts);
   const productsQ = useQuery({
     queryKey: ["public-products", slug],
     queryFn: () => getProducts({ data: { slug } }),
+    initialData: ssrProducts,
   });
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("");
@@ -132,12 +135,18 @@ function StorePage() {
                     size="sm"
                     className="mt-3 w-full"
                     style={{ background: primary }}
+                    disabled={Number(p.inventory_count) <= 0}
                     onClick={() => {
-                      add(slug, { productId: p.id, name: p.name, price: Number(p.price), image: p.images?.[0], quantity: 1 });
-                      toast.success("Added to cart");
+                      const r = add(slug, {
+                        productId: p.id, name: p.name, price: Number(p.price),
+                        image: p.images?.[0], quantity: 1,
+                        maxQuantity: Number(p.inventory_count) || 0,
+                      });
+                      if (r.ok) toast.success("Added to cart");
+                      else toast.error(r.reason ?? "Couldn't add");
                     }}
                   >
-                    <ShoppingCart className="mr-1 h-3 w-3" /> Add
+                    <ShoppingCart className="mr-1 h-3 w-3" /> {Number(p.inventory_count) <= 0 ? "Sold out" : "Add"}
                   </Button>
                 </div>
               </Card>
