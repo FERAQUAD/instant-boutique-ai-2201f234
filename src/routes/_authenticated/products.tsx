@@ -43,8 +43,17 @@ function ProductsPage() {
   const storeQ = useQuery({ queryKey: ["my-store"], queryFn: () => getStore({}) });
   const productsQ = useQuery({ queryKey: ["my-products"], queryFn: () => list({}), enabled: !!storeQ.data });
 
+  const search = Route.useSearch();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
+
+  useEffect(() => {
+    if (search.new === "1") {
+      setEditing(null);
+      setOpen(true);
+      navigate({ to: "/products", search: {}, replace: true });
+    }
+  }, [search.new]);
 
   if (storeQ.isLoading) return <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">Loading…</div>;
   if (storeQ.isSuccess && !storeQ.data) { navigate({ to: "/onboarding" }); return null; }
