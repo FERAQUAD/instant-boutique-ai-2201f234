@@ -51,7 +51,7 @@ function Checkout() {
     if (items.length === 0) { toast.error("Your cart is empty"); return; }
     setSubmitting(true);
     try {
-      await placeOrder({
+      const res = await placeOrder({
         data: {
           store_slug: slug,
           customer_name: name,
@@ -63,9 +63,11 @@ function Checkout() {
         },
       });
       clear(slug);
-      toast.success("Order placed! The seller will contact you.");
-      navigate({ to: "/s/$slug", params: { slug } });
-    } catch (e) { toast.error((e as Error).message); }
+      toast.success("Order placed!");
+      navigate({ to: "/s/$slug/order/$id", params: { slug, id: res.orderId } });
+    } catch (e) {
+      toast.error((e as Error).message, { duration: 8000 });
+    }
     finally { setSubmitting(false); }
   }
 
@@ -103,7 +105,13 @@ function Checkout() {
                     <div className="flex items-center rounded-md border border-border">
                       <button onClick={() => setQty(slug, it.productId, it.quantity - 1)} className="px-2 py-1"><Minus className="h-3 w-3" /></button>
                       <span className="w-8 text-center text-xs">{it.quantity}</span>
-                      <button onClick={() => setQty(slug, it.productId, it.quantity + 1)} className="px-2 py-1"><Plus className="h-3 w-3" /></button>
+                      <button
+                        onClick={() => {
+                          const r = setQty(slug, it.productId, it.quantity + 1);
+                          if (!r.ok) toast.error(r.reason ?? "Limit reached");
+                        }}
+                        className="px-2 py-1"
+                      ><Plus className="h-3 w-3" /></button>
                     </div>
                     <button onClick={() => remove(slug, it.productId)} className="text-muted-foreground hover:text-destructive">
                       <Trash2 className="h-4 w-4" />
