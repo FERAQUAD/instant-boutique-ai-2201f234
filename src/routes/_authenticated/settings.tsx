@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Sparkles } from "lucide-react";
 import { getMyStore, updateMyStore } from "@/lib/stores.functions";
 import { DashboardShell } from "@/components/dashboard-shell";
 import { Card } from "@/components/ui/card";
@@ -10,7 +11,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
+
+const BUSINESS_TYPES = [
+  "Fashion & Apparel", "Beauty & Cosmetics", "Electronics & Gadgets",
+  "Food & Groceries", "Home & Furniture", "Health & Wellness",
+  "Jewelry & Accessories", "Baby & Kids", "Sports & Outdoors",
+  "Books & Stationery", "Art & Crafts", "Other",
+];
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Settings — StoreGen" }] }),
@@ -27,6 +37,9 @@ function SettingsPage() {
   const [form, setForm] = useState<any>(null);
   const [uploading, setUploading] = useState<"logo" | "banner" | null>(null);
   const [saving, setSaving] = useState(false);
+  const [aiBusiness, setAiBusiness] = useState<string>("Fashion & Apparel");
+  const [aiVibe, setAiVibe] = useState<string>("");
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     if (storeQ.isSuccess && !storeQ.data) navigate({ to: "/onboarding" });
