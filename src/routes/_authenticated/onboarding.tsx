@@ -23,6 +23,7 @@ function Onboarding() {
 
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
+  const [slugTouched, setSlugTouched] = useState(false);
   const [slugStatus, setSlugStatus] = useState<"idle" | "checking" | "ok" | "taken">("idle");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -34,8 +35,8 @@ function Onboarding() {
   }, []);
 
   useEffect(() => {
-    setSlug(slugify(name));
-  }, [name]);
+    if (!slugTouched) setSlug(slugify(name));
+  }, [name, slugTouched]);
 
   useEffect(() => {
     if (!slug || slug.length < 2) { setSlugStatus("idle"); return; }
@@ -101,7 +102,7 @@ function Onboarding() {
               <Input
                 required
                 value={slug}
-                onChange={(e) => setSlug(slugify(e.target.value))}
+                onChange={(e) => { setSlugTouched(true); setSlug(slugify(e.target.value)); }}
                 placeholder="your-store"
               />
             </div>
