@@ -166,8 +166,12 @@ function ProductForm({
   const [inventory, setInventory] = useState(String(initial?.inventory_count ?? 0));
   const [category, setCategory] = useState(initial?.category ?? "");
   const [images, setImages] = useState<string[]>(initial?.images ?? []);
+  const [published, setPublished] = useState<boolean>(initial ? initial.is_published : true);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  const invNum = Number(inventory) || 0;
+  const effectivePublished = published && invNum > 0;
 
   async function uploadFiles(files: FileList | null) {
     if (!files?.length) return;
@@ -202,7 +206,7 @@ function ProductForm({
         inventory_count: Number(inventory),
         category: category || null,
         images,
-        is_published: true,
+        is_published: effectivePublished,
       });
     } finally { setSubmitting(false); }
   }
