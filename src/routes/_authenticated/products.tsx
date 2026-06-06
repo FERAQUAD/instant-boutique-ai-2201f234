@@ -258,6 +258,17 @@ function ProductForm({
           </div>
         )}
       </div>
+      <div className="flex items-center justify-between rounded-md border border-border p-3">
+        <div>
+          <Label className="text-sm">Publish to storefront</Label>
+          <p className="text-xs text-muted-foreground">
+            {invNum === 0
+              ? "Inventory is 0 — product will stay hidden until you add stock."
+              : "Customers can see and order this product."}
+          </p>
+        </div>
+        <Switch checked={effectivePublished} disabled={invNum === 0} onCheckedChange={setPublished} />
+      </div>
       <Button type="submit" className="w-full" disabled={submitting || uploading}>
         {submitting ? "Saving…" : "Save product"}
       </Button>
