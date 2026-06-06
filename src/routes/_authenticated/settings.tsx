@@ -160,6 +160,42 @@ function SettingsPage() {
         </Card>
 
         <Card className="space-y-4 p-6">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <h3 className="font-display font-bold">AI banner generator</h3>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Let Lovable AI design a hero banner for your storefront based on your business type and style.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label>Business type</Label>
+              <Select value={aiBusiness} onValueChange={setAiBusiness}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {BUSINESS_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Style / vibe (optional)</Label>
+              <Input value={aiVibe} onChange={(e) => setAiVibe(e.target.value)} placeholder="e.g. luxury, minimalist, vibrant…" />
+            </div>
+          </div>
+          {form.hero_banner && (
+            <div>
+              <Label className="text-xs">Current banner preview</Label>
+              <img src={form.hero_banner} className="mt-1 h-32 w-full rounded-md object-cover" alt="banner preview" />
+            </div>
+          )}
+          <Button onClick={generateBanner} disabled={generating} variant="outline" className="w-full">
+            <Sparkles className="mr-2 h-4 w-4" />
+            {generating ? "Generating banner… (10-20s)" : "Generate banner with AI"}
+          </Button>
+          <p className="text-xs text-muted-foreground">After generating, click <strong>Save changes</strong> below to publish to your storefront.</p>
+        </Card>
+
+        <Card className="space-y-4 p-6">
           <h3 className="font-display font-bold">Contact & Social</h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5"><Label>Email</Label><Input value={form.contact_email ?? ""} onChange={(e) => setForm({ ...form, contact_email: e.target.value })} /></div>
