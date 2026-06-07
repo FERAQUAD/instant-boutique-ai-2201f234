@@ -237,8 +237,15 @@ function ProductForm({
         <Input required value={name} onChange={(e) => setName(e.target.value)} />
       </div>
       <div className="space-y-1.5">
-        <Label>Description</Label>
-        <Textarea rows={3} value={description ?? ""} onChange={(e) => setDescription(e.target.value)} />
+        <div className="flex items-center justify-between">
+          <Label>Description</Label>
+          <Button type="button" variant="ghost" size="sm" onClick={aiWriteDescription} disabled={genDesc} className="h-7 gap-1 text-xs">
+            <Sparkles className="h-3 w-3" />
+            {genDesc ? "Writing…" : "Write with AI"}
+          </Button>
+        </div>
+        <Textarea rows={4} value={description ?? ""} onChange={(e) => setDescription(e.target.value)} placeholder="Describe your product or click 'Write with AI'" />
+      </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
