@@ -111,7 +111,7 @@ export const generateStoreBanner = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertStoreOwner(data.storeId, context.userId);
     const prompt = `Wide cinematic 16:9 e-commerce hero banner for a ${data.businessType} business called "${data.storeName}". ${data.vibe ? `Mood: ${data.vibe}.` : ""} ${data.primary ? `Accent color: ${data.primary}.` : ""} Editorial product photography, dramatic studio lighting, generous negative space on the left for headline text overlay, ultra high quality, photorealistic. No text, no logos, no watermarks.`;
-    const bytes = await generateImage(prompt);
+    const bytes = await generateImage(prompt, "1536x1024");
     const url = await uploadStoreAsset(context.userId, bytes, "banner");
     return { url };
   });
