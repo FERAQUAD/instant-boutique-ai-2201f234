@@ -53,22 +53,24 @@ Return ONLY the description text, no preface, no quotes.`;
 
 /* ----------------------- Image helpers ----------------------- */
 
-async function generateImage(prompt: string): Promise<Uint8Array> {
+async function generateImage(prompt: string, size: "1024x1024" | "1536x1024" = "1024x1024"): Promise<Uint8Array> {
   const key = process.env.LOVABLE_API_KEY;
   if (!key) throw new Error("Missing LOVABLE_API_KEY");
   const res = await fetch(`${GATEWAY}/images/generations`, {
     method: "POST",
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "google/gemini-2.5-flash-image",
+      model: "openai/gpt-image-2",
       prompt,
+      quality: "low",
+      size,
       n: 1,
     }),
   });
   if (!res.ok) throw gatewayError(res.status, await res.text().catch(() => ""));
   const json: any = await res.json();
   const b64: string | undefined = json?.data?.[0]?.b64_json;
-  if (!b64) throw new Error("No image returned");
+  if (!b64) throw new Error("No image returned from AI");
   return Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
 }
 
