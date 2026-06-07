@@ -32,6 +32,8 @@ function SettingsPage() {
   const qc = useQueryClient();
   const getStore = useServerFn(getMyStore);
   const update = useServerFn(updateMyStore);
+  const genBanner = useServerFn(generateStoreBanner);
+  const genLogo = useServerFn(generateStoreLogo);
   const storeQ = useQuery({ queryKey: ["my-store"], queryFn: () => getStore({}) });
 
   const [form, setForm] = useState<any>(null);
@@ -39,7 +41,8 @@ function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [aiBusiness, setAiBusiness] = useState<string>("Fashion & Apparel");
   const [aiVibe, setAiVibe] = useState<string>("");
-  const [generating, setGenerating] = useState(false);
+  const [aiLogoStyle, setAiLogoStyle] = useState<string>("");
+  const [generating, setGenerating] = useState<"banner" | "logo" | null>(null);
 
   useEffect(() => {
     if (storeQ.isSuccess && !storeQ.data) navigate({ to: "/onboarding" });
