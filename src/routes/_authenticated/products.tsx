@@ -3,8 +3,9 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Package } from "lucide-react";
+import { Plus, Pencil, Trash2, Package, Sparkles } from "lucide-react";
 import { listMyProducts, createProduct, updateProduct, deleteProduct } from "@/lib/products.functions";
+import { generateProductDescription } from "@/lib/ai.functions";
 import { getMyStore } from "@/lib/stores.functions";
 import { DashboardShell } from "@/components/dashboard-shell";
 import { Card } from "@/components/ui/card";
@@ -169,9 +170,27 @@ function ProductForm({
   const [published, setPublished] = useState<boolean>(initial ? initial.is_published : true);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [genDesc, setGenDesc] = useState(false);
+  const genDescription = useServerFn(generateProductDescription);
 
   const invNum = Number(inventory) || 0;
   const effectivePublished = published && invNum > 0;
+
+  async function aiWriteDescription() {
+    if (!name.trim()) { toast.error("Add a product name first"); return; }
+    setGenDesc(true);
+    try {
+      const { description: text } = await genDescription({
+        data: { name, category: category || undefined },
+      });
+      setDescription(text);
+      toast.success("Description written");
+    } catch (e) {
+      toast.error((e as Error).message, { duration: 8000 });
+    } finally {
+      setGenDesc(false);
+    }
+  }
 
   async function uploadFiles(files: FileList | null) {
     if (!files?.length) return;
@@ -218,8 +237,14 @@ function ProductForm({
         <Input required value={name} onChange={(e) => setName(e.target.value)} />
       </div>
       <div className="space-y-1.5">
-        <Label>Description</Label>
-        <Textarea rows={3} value={description ?? ""} onChange={(e) => setDescription(e.target.value)} />
+        <div className="flex items-center justify-between">
+          <Label>Description</Label>
+          <Button type="button" variant="ghost" size="sm" onClick={aiWriteDescription} disabled={genDesc} className="h-7 gap-1 text-xs">
+            <Sparkles className="h-3 w-3" />
+            {genDesc ? "Writing…" : "Write with AI"}
+          </Button>
+        </div>
+        <Textarea rows={4} value={description ?? ""} onChange={(e) => setDescription(e.target.value)} placeholder="Describe your product or click 'Write with AI'" />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
