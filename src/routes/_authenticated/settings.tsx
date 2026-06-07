@@ -201,11 +201,35 @@ function SettingsPage() {
               <img src={form.hero_banner} className="mt-1 h-32 w-full rounded-md object-cover" alt="banner preview" />
             </div>
           )}
-          <Button onClick={generateBanner} disabled={generating} variant="outline" className="w-full">
+          <Button onClick={generateBanner} disabled={generating !== null} variant="outline" className="w-full">
             <Sparkles className="mr-2 h-4 w-4" />
-            {generating ? "Generating banner… (10-20s)" : "Generate banner with AI"}
+            {generating === "banner" ? "Generating banner… (10-20s)" : "Generate banner with AI"}
           </Button>
           <p className="text-xs text-muted-foreground">After generating, click <strong>Save changes</strong> below to publish to your storefront.</p>
+        </Card>
+
+        <Card className="space-y-4 p-6">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <h3 className="font-display font-bold">AI logo generator</h3>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Generate a simple logo mark for your brand. Uses the business type selected above.
+          </p>
+          <div className="space-y-1.5">
+            <Label>Logo style (optional)</Label>
+            <Input value={aiLogoStyle} onChange={(e) => setAiLogoStyle(e.target.value)} placeholder="e.g. geometric, playful, monogram…" />
+          </div>
+          {form.store_logo && (
+            <div>
+              <Label className="text-xs">Current logo preview</Label>
+              <img src={form.store_logo} className="mt-1 h-20 w-20 rounded-md object-cover" alt="logo preview" />
+            </div>
+          )}
+          <Button onClick={generateLogo} disabled={generating !== null} variant="outline" className="w-full">
+            <Sparkles className="mr-2 h-4 w-4" />
+            {generating === "logo" ? "Generating logo…" : "Generate logo with AI"}
+          </Button>
         </Card>
 
         <Card className="space-y-4 p-6">
