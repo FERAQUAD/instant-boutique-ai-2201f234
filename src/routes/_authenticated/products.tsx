@@ -246,7 +246,6 @@ function ProductForm({
         </div>
         <Textarea rows={4} value={description ?? ""} onChange={(e) => setDescription(e.target.value)} placeholder="Describe your product or click 'Write with AI'" />
       </div>
-      </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label>Price (₦)</Label>
