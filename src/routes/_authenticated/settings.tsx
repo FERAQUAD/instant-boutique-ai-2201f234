@@ -90,35 +90,45 @@ function SettingsPage() {
 
   async function generateBanner() {
     if (!form?.id) return;
-    setGenerating(true);
+    setGenerating("banner");
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not signed in");
-      const res = await fetch("/api/generate-banner", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const { url } = await genBanner({
+        data: {
           storeId: form.id,
-          ownerId: user.id,
           storeName: form.store_name,
           businessType: aiBusiness,
           vibe: aiVibe || undefined,
           primary: form.theme_settings?.primary,
-        }),
+        },
       });
-      if (!res.ok) {
-        const txt = await res.text();
-        if (res.status === 429) throw new Error("AI is busy. Please try again in a moment.");
-        if (res.status === 402) throw new Error("AI credits exhausted. Add credits in workspace settings.");
-        throw new Error(txt || "Generation failed");
-      }
-      const json = await res.json();
-      setForm((f: any) => ({ ...f, hero_banner: json.url }));
+      setForm((f: any) => ({ ...f, hero_banner: url }));
       toast.success("Banner generated! Click Save to publish.");
     } catch (e) {
       toast.error((e as Error).message, { duration: 8000 });
     } finally {
-      setGenerating(false);
+      setGenerating(null);
+    }
+  }
+
+  async function generateLogo() {
+    if (!form?.id) return;
+    setGenerating("logo");
+    try {
+      const { url } = await genLogo({
+        data: {
+          storeId: form.id,
+          storeName: form.store_name,
+          businessType: aiBusiness,
+          style: aiLogoStyle || undefined,
+          primary: form.theme_settings?.primary,
+        },
+      });
+      setForm((f: any) => ({ ...f, store_logo: url }));
+      toast.success("Logo generated! Click Save to publish.");
+    } catch (e) {
+      toast.error((e as Error).message, { duration: 8000 });
+    } finally {
+      setGenerating(null);
     }
   }
 
