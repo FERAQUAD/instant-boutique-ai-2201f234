@@ -170,9 +170,27 @@ function ProductForm({
   const [published, setPublished] = useState<boolean>(initial ? initial.is_published : true);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [genDesc, setGenDesc] = useState(false);
+  const genDescription = useServerFn(generateProductDescription);
 
   const invNum = Number(inventory) || 0;
   const effectivePublished = published && invNum > 0;
+
+  async function aiWriteDescription() {
+    if (!name.trim()) { toast.error("Add a product name first"); return; }
+    setGenDesc(true);
+    try {
+      const { description: text } = await genDescription({
+        data: { name, category: category || undefined },
+      });
+      setDescription(text);
+      toast.success("Description written");
+    } catch (e) {
+      toast.error((e as Error).message, { duration: 8000 });
+    } finally {
+      setGenDesc(false);
+    }
+  }
 
   async function uploadFiles(files: FileList | null) {
     if (!files?.length) return;
