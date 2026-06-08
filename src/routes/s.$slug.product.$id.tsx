@@ -77,6 +77,13 @@ function ProductPage() {
               {product.inventory_count > 0 ? `${product.inventory_count} in stock` : "Out of stock"}
             </p>
 
+            {product.description && (
+              <div className="mt-6 whitespace-pre-wrap text-sm leading-relaxed text-foreground/80">
+                {product.description}
+              </div>
+            )}
+
+
             {sizes.length > 0 && (
               <div className="mt-5">
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Size</p>
