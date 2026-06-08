@@ -116,7 +116,7 @@ function ProductsPage() {
               <Card key={p.id} className="overflow-hidden">
                 <div className="aspect-square bg-muted">
                   {p.images?.[0] ? (
-                    <img src={p.images[0]} alt={p.name} className="h-full w-full object-cover" />
+                    <img src={p.images[0]} alt={p.name} loading="lazy" decoding="async" className="h-full w-full object-cover" />
                   ) : (
                     <div className="flex h-full items-center justify-center text-muted-foreground">
                       <Package className="h-10 w-10" />
