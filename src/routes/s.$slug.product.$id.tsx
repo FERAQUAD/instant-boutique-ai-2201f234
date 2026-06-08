@@ -43,7 +43,7 @@ function ProductPage() {
           <div>
             <div className="aspect-square overflow-hidden rounded-lg bg-muted">
               {images[imgIdx] ? (
-                <img src={images[imgIdx]} alt={product.name} className="h-full w-full object-cover" />
+                <img src={images[imgIdx]} alt={product.name} loading="eager" fetchPriority="high" decoding="async" className="h-full w-full object-cover" />
               ) : <div className="flex h-full items-center justify-center text-muted-foreground">No image</div>}
             </div>
             {images.length > 1 && (
@@ -54,7 +54,7 @@ function ProductPage() {
                     onClick={() => setImgIdx(i)}
                     className={`h-16 w-16 shrink-0 overflow-hidden rounded border-2 ${i === imgIdx ? "border-primary" : "border-transparent"}`}
                   >
-                    <img src={img} alt="" className="h-full w-full object-cover" />
+                    <img src={img} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
                   </button>
                 ))}
               </div>
