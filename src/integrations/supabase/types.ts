@@ -148,6 +148,7 @@ export type Database = {
       products: {
         Row: {
           category: string | null
+          colors: string[]
           compare_at_price: number | null
           created_at: string
           description: string | null
@@ -157,13 +158,16 @@ export type Database = {
           is_published: boolean
           name: string
           price: number
+          sizes: string[]
           sku: string | null
           store_id: string
           tags: string[]
           updated_at: string
+          weight_grams: number | null
         }
         Insert: {
           category?: string | null
+          colors?: string[]
           compare_at_price?: number | null
           created_at?: string
           description?: string | null
@@ -173,13 +177,16 @@ export type Database = {
           is_published?: boolean
           name: string
           price?: number
+          sizes?: string[]
           sku?: string | null
           store_id: string
           tags?: string[]
           updated_at?: string
+          weight_grams?: number | null
         }
         Update: {
           category?: string | null
+          colors?: string[]
           compare_at_price?: number | null
           created_at?: string
           description?: string | null
@@ -189,10 +196,12 @@ export type Database = {
           is_published?: boolean
           name?: string
           price?: number
+          sizes?: string[]
           sku?: string | null
           store_id?: string
           tags?: string[]
           updated_at?: string
+          weight_grams?: number | null
         }
         Relationships: [
           {
