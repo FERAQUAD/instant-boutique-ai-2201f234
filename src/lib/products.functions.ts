@@ -13,6 +13,9 @@ const productSchema = z.object({
   category: z.string().max(60).nullable().optional(),
   tags: z.array(z.string().max(40)).max(20).default([]),
   is_published: z.boolean().default(true),
+  sizes: z.array(z.string().max(20)).max(30).default([]),
+  colors: z.array(z.string().max(30)).max(30).default([]),
+  weight_grams: z.number().int().min(0).max(1000000).nullable().optional(),
 });
 
 async function getOwnStoreId(supabase: ReturnType<typeof getSupabase>, userId: string) {

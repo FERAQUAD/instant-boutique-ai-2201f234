@@ -30,6 +30,7 @@ type Product = {
   id: string; name: string; description: string | null; price: number;
   compare_at_price: number | null; inventory_count: number; category: string | null;
   images: string[]; is_published: boolean;
+  sizes: string[]; colors: string[]; weight_grams: number | null;
 };
 
 function ProductsPage() {
@@ -115,7 +116,7 @@ function ProductsPage() {
               <Card key={p.id} className="overflow-hidden">
                 <div className="aspect-square bg-muted">
                   {p.images?.[0] ? (
-                    <img src={p.images[0]} alt={p.name} className="h-full w-full object-cover" />
+                    <img src={p.images[0]} alt={p.name} loading="lazy" decoding="async" className="h-full w-full object-cover" />
                   ) : (
                     <div className="flex h-full items-center justify-center text-muted-foreground">
                       <Package className="h-10 w-10" />
@@ -168,6 +169,9 @@ function ProductForm({
   const [category, setCategory] = useState(initial?.category ?? "");
   const [images, setImages] = useState<string[]>(initial?.images ?? []);
   const [published, setPublished] = useState<boolean>(initial ? initial.is_published : true);
+  const [sizes, setSizes] = useState<string>((initial?.sizes ?? []).join(", "));
+  const [colors, setColors] = useState<string>((initial?.colors ?? []).join(", "));
+  const [weight, setWeight] = useState<string>(initial?.weight_grams ? String(initial.weight_grams) : "");
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [genDesc, setGenDesc] = useState(false);
@@ -226,6 +230,9 @@ function ProductForm({
         category: category || null,
         images,
         is_published: effectivePublished,
+        sizes: sizes.split(",").map((s) => s.trim()).filter(Boolean),
+        colors: colors.split(",").map((s) => s.trim()).filter(Boolean),
+        weight_grams: weight ? Number(weight) : null,
       });
     } finally { setSubmitting(false); }
   }
@@ -262,6 +269,22 @@ function ProductForm({
         <div className="space-y-1.5">
           <Label>Category</Label>
           <Input value={category ?? ""} onChange={(e) => setCategory(e.target.value)} placeholder="e.g. Shoes" />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1.5">
+          <Label>Sizes</Label>
+          <Input value={sizes} onChange={(e) => setSizes(e.target.value)} placeholder="S, M, L, XL" />
+          <p className="text-xs text-muted-foreground">Comma separated</p>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Colors</Label>
+          <Input value={colors} onChange={(e) => setColors(e.target.value)} placeholder="Red, Blue, Black" />
+          <p className="text-xs text-muted-foreground">Comma separated</p>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Weight (grams)</Label>
+          <Input type="number" min={0} value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="e.g. 500" />
         </div>
       </div>
       <div className="space-y-1.5">

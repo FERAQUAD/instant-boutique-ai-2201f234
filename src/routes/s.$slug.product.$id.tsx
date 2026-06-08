@@ -31,6 +31,10 @@ function ProductPage() {
   const [imgIdx, setImgIdx] = useState(0);
   const primary = (store.theme_settings as any)?.primary ?? "#ea580c";
   const images: string[] = product.images ?? [];
+  const sizes: string[] = (product as any).sizes ?? [];
+  const colors: string[] = (product as any).colors ?? [];
+  const [size, setSize] = useState<string>(sizes[0] ?? "");
+  const [color, setColor] = useState<string>(colors[0] ?? "");
 
   return (
     <StoreShell store={store}>
@@ -43,7 +47,7 @@ function ProductPage() {
           <div>
             <div className="aspect-square overflow-hidden rounded-lg bg-muted">
               {images[imgIdx] ? (
-                <img src={images[imgIdx]} alt={product.name} className="h-full w-full object-cover" />
+                <img src={images[imgIdx]} alt={product.name} loading="eager" fetchPriority="high" decoding="async" className="h-full w-full object-cover" />
               ) : <div className="flex h-full items-center justify-center text-muted-foreground">No image</div>}
             </div>
             {images.length > 1 && (
@@ -54,7 +58,7 @@ function ProductPage() {
                     onClick={() => setImgIdx(i)}
                     className={`h-16 w-16 shrink-0 overflow-hidden rounded border-2 ${i === imgIdx ? "border-primary" : "border-transparent"}`}
                   >
-                    <img src={img} alt="" className="h-full w-full object-cover" />
+                    <img src={img} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
                   </button>
                 ))}
               </div>
@@ -79,6 +83,39 @@ function ProductPage() {
               </div>
             )}
 
+
+            {sizes.length > 0 && (
+              <div className="mt-5">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Size</p>
+                <div className="flex flex-wrap gap-2">
+                  {sizes.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setSize(s)}
+                      className={`min-w-10 rounded-md border px-3 py-1.5 text-sm transition ${size === s ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground"}`}
+                    >{s}</button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {colors.length > 0 && (
+              <div className="mt-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Color</p>
+                <div className="flex flex-wrap gap-2">
+                  {colors.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setColor(c)}
+                      className={`rounded-md border px-3 py-1.5 text-sm transition ${color === c ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground"}`}
+                    >{c}</button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="mt-6 flex items-center gap-3">
               <div className="flex items-center rounded-md border border-border">
                 <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-3 py-2"><Minus className="h-3 w-3" /></button>
@@ -90,8 +127,11 @@ function ProductPage() {
                 style={{ background: primary }}
                 disabled={product.inventory_count === 0}
                 onClick={() => {
+                  const variant = [size, color].filter(Boolean).join(" / ");
                   const r = add(slug, {
-                    productId: product.id, name: product.name, price: Number(product.price),
+                    productId: product.id,
+                    name: variant ? `${product.name} (${variant})` : product.name,
+                    price: Number(product.price),
                     image: images[0], quantity: qty,
                     maxQuantity: Number(product.inventory_count) || 0,
                   });
