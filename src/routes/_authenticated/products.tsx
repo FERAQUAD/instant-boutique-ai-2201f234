@@ -30,6 +30,7 @@ type Product = {
   id: string; name: string; description: string | null; price: number;
   compare_at_price: number | null; inventory_count: number; category: string | null;
   images: string[]; is_published: boolean;
+  sizes: string[]; colors: string[]; weight_grams: number | null;
 };
 
 function ProductsPage() {
