@@ -169,6 +169,9 @@ function ProductForm({
   const [category, setCategory] = useState(initial?.category ?? "");
   const [images, setImages] = useState<string[]>(initial?.images ?? []);
   const [published, setPublished] = useState<boolean>(initial ? initial.is_published : true);
+  const [sizes, setSizes] = useState<string>((initial?.sizes ?? []).join(", "));
+  const [colors, setColors] = useState<string>((initial?.colors ?? []).join(", "));
+  const [weight, setWeight] = useState<string>(initial?.weight_grams ? String(initial.weight_grams) : "");
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [genDesc, setGenDesc] = useState(false);
