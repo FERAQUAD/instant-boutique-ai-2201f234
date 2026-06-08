@@ -65,7 +65,7 @@ function StorePage() {
     <StoreShell store={store}>
       {store.hero_banner ? (
         <div className="relative h-56 sm:h-72 md:h-80">
-          <img src={store.hero_banner} alt="" className="h-full w-full object-cover" />
+          <img src={store.hero_banner} alt="" className="h-full w-full object-cover" loading="eager" fetchPriority="high" decoding="async" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           <div className="absolute bottom-6 left-0 right-0 mx-auto max-w-6xl px-4 text-white">
             <h1 className="font-display text-3xl font-bold sm:text-4xl">{store.store_name}</h1>
