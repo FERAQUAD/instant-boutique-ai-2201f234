@@ -77,9 +77,35 @@ function ProductPage() {
               {product.inventory_count > 0 ? `${product.inventory_count} in stock` : "Out of stock"}
             </p>
 
-            {product.description && (
-              <div className="mt-6 whitespace-pre-wrap text-sm leading-relaxed text-foreground/80">
-                {product.description}
+            {sizes.length > 0 && (
+              <div className="mt-5">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Size</p>
+                <div className="flex flex-wrap gap-2">
+                  {sizes.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setSize(s)}
+                      className={`min-w-10 rounded-md border px-3 py-1.5 text-sm transition ${size === s ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground"}`}
+                    >{s}</button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {colors.length > 0 && (
+              <div className="mt-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Color</p>
+                <div className="flex flex-wrap gap-2">
+                  {colors.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setColor(c)}
+                      className={`rounded-md border px-3 py-1.5 text-sm transition ${color === c ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground"}`}
+                    >{c}</button>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -94,8 +120,11 @@ function ProductPage() {
                 style={{ background: primary }}
                 disabled={product.inventory_count === 0}
                 onClick={() => {
+                  const variant = [size, color].filter(Boolean).join(" / ");
                   const r = add(slug, {
-                    productId: product.id, name: product.name, price: Number(product.price),
+                    productId: product.id,
+                    name: variant ? `${product.name} (${variant})` : product.name,
+                    price: Number(product.price),
                     image: images[0], quantity: qty,
                     maxQuantity: Number(product.inventory_count) || 0,
                   });
