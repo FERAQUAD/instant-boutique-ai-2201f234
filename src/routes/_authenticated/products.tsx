@@ -230,6 +230,9 @@ function ProductForm({
         category: category || null,
         images,
         is_published: effectivePublished,
+        sizes: sizes.split(",").map((s) => s.trim()).filter(Boolean),
+        colors: colors.split(",").map((s) => s.trim()).filter(Boolean),
+        weight_grams: weight ? Number(weight) : null,
       });
     } finally { setSubmitting(false); }
   }
