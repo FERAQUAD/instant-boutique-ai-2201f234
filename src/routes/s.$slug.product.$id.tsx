@@ -31,6 +31,10 @@ function ProductPage() {
   const [imgIdx, setImgIdx] = useState(0);
   const primary = (store.theme_settings as any)?.primary ?? "#ea580c";
   const images: string[] = product.images ?? [];
+  const sizes: string[] = (product as any).sizes ?? [];
+  const colors: string[] = (product as any).colors ?? [];
+  const [size, setSize] = useState<string>(sizes[0] ?? "");
+  const [color, setColor] = useState<string>(colors[0] ?? "");
 
   return (
     <StoreShell store={store}>
