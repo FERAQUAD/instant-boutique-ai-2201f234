@@ -271,6 +271,22 @@ function ProductForm({
           <Input value={category ?? ""} onChange={(e) => setCategory(e.target.value)} placeholder="e.g. Shoes" />
         </div>
       </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1.5">
+          <Label>Sizes</Label>
+          <Input value={sizes} onChange={(e) => setSizes(e.target.value)} placeholder="S, M, L, XL" />
+          <p className="text-xs text-muted-foreground">Comma separated</p>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Colors</Label>
+          <Input value={colors} onChange={(e) => setColors(e.target.value)} placeholder="Red, Blue, Black" />
+          <p className="text-xs text-muted-foreground">Comma separated</p>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Weight (grams)</Label>
+          <Input type="number" min={0} value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="e.g. 500" />
+        </div>
+      </div>
       <div className="space-y-1.5">
         <Label>Images (up to 10)</Label>
         <Input type="file" multiple accept="image/*" onChange={(e) => uploadFiles(e.target.files)} disabled={uploading} />
