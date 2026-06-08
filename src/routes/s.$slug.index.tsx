@@ -112,7 +112,7 @@ function StorePage() {
                 <Link to="/s/$slug/product/$id" params={{ slug, id: p.id }} className="block">
                   <div className="aspect-square bg-muted">
                     {p.images?.[0] ? (
-                      <img src={p.images[0]} alt={p.name} className="h-full w-full object-cover transition group-hover:scale-105" />
+                      <img src={p.images[0]} alt={p.name} loading="lazy" decoding="async" className="h-full w-full object-cover transition group-hover:scale-105" />
                     ) : <div className="flex h-full items-center justify-center text-muted-foreground text-xs">No image</div>}
                   </div>
                 </Link>
